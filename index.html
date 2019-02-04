@@ -62,6 +62,298 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-docker/私有node仓库verdaccio部署-docker" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/04/docker/私有node仓库verdaccio部署-docker/" class="article-date">
+  <time datetime="2019-02-04T11:41:05.000Z" itemprop="datePublished">2019-02-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/04/docker/私有node仓库verdaccio部署-docker/">私有node仓库verdaccio部署(docker)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="why-verdaccio"><a href="#why-verdaccio" class="headerlink" title="why verdaccio?"></a>why verdaccio?</h2><p><a href="https://github.com/verdaccio/verdaccio">verdaccio</a>基于sinopia fork出来的node仓库，具备向后兼容特性，因为<a href="https://github.com/rlidwka/sinopia">sinopia</a>已经不再维护,故选择verdaccio作为私有node仓库。</p>
+<h2 id="why-docker"><a href="#why-docker" class="headerlink" title="why docker?"></a>why docker?</h2><p>原有的方案采用<a href="https://github.com/verdaccio/verdaccio">pm2</a>作为node仓库的进程管理器，它是一款优秀的node进程管理器，具有负载均衡等特点。但我们使用pm2的主要原因是为了避免仓库进程突然宕掉。从这点来看，运行docker容器就可以了，只要加上–restart=always，就能实现服务挂掉自重启。</p>
+<h2 id="镜像"><a href="#镜像" class="headerlink" title="镜像"></a>镜像</h2><p>采用官方镜像verdaccio/verdaccio。镜像下载命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull verdaccio/verdaccio</span><br></pre></td></tr></table></figure></p>
+<h2 id="数据持久化"><a href="#数据持久化" class="headerlink" title="数据持久化"></a>数据持久化</h2><p>在磁盘上建立目录/home/docker/appData/verdaccio，作为仓库的storage，注意由于verdaccio以非root用户运行，需要给该目录赋予写和读权限：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod -R 777 /home/docker/appData/verdaccio</span><br></pre></td></tr></table></figure></p>
+<h2 id="运行"><a href="#运行" class="headerlink" title="运行"></a>运行</h2><p>执行以下脚本，启动一个名叫verdaccio，宕机自重启的docker容器<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">set -x</span><br><span class="line">V_PATH=/home/docker/appData/verdaccio</span><br><span class="line">docker run -it --name verdaccio -p 4873:4873 \</span><br><span class="line">        -v $V_PATH/storage:/verdaccio/storage \</span><br><span class="line">        --restart=always \</span><br><span class="line">        verdaccio/verdaccio</span><br></pre></td></tr></table></figure></p>
+<p>生成容器:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS                                                                                NAMES</span><br><span class="line">d08ca15fb244        verdaccio/verdaccio   &quot;/usr/local/bin/dumb…&quot;   2 hours ago         Up 2 hours          0.0.0.0:4873-&gt;4873/tcp                                                               verdaccio</span><br></pre></td></tr></table></figure></p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>和sinopia完全一样</p>
+<h2 id="日志查看"><a href="#日志查看" class="headerlink" title="日志查看"></a>日志查看</h2><p>集成到容器日志中，查看命令为<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker inspect verdaccio</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/02/04/docker/私有node仓库verdaccio部署-docker/" data-id="cjrq9rtxk000dmwqxmr1i6psp" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-vue/vue项目模板" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/04/vue/vue项目模板/" class="article-date">
+  <time datetime="2019-02-04T09:29:26.000Z" itemprop="datePublished">2019-02-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/04/vue/vue项目模板/">vue项目模板</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>背景<br>目前vue-cli官方提供的webpack模板，和实际组内项目有所区别，每次新建一个项目，都需要对用官方模板创建的项目做一些细节调整，具体包括:</p>
+<ol>
+<li>输出目录改为webapp(默认为dist);</li>
+<li>隐藏生产环境源码（默认可见);</li>
+<li>安装项目依赖（jquery、node-sass等）<br>等等，为了加快项目开发效率，有必要对现有项目进行梳理，提取出一套适用于CM web项目的webpack模板。</li>
+</ol>
+<p>定制模板<br>vue-cli提供了定制模板的方法，允许开发团队定制自己的个性模板。这里大致介绍一下我们的定制模板的功能以及目录结构。<br>功能<br>  ● 国际化<br>  ● 服务器代理<br>  ● 提供mock环境<br>  ● 预置jquery, node-sass, vue-router, vuex, mockjs等常用插件<br>  ● 生产环境代码隐藏<br>  ● 编译产出目录为webapp</p>
+<p><a href="http://note.youdao.com/noteshare?id=366f5d0692c89c7a0d5f44683719bded&sub=F04160B34B874315AB9435EA15459460" target="_blank">项目模板</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/02/04/vue/vue项目模板/" data-id="cjrq9rtxc0008mwqx6acd3wce" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/">vue</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-docker/vue项目模板demo部署" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/04/docker/vue项目模板demo部署/" class="article-date">
+  <time datetime="2019-02-04T09:19:49.000Z" itemprop="datePublished">2019-02-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/04/docker/vue项目模板demo部署/">vue项目模板demo部署(docker)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="优点"><a href="#优点" class="headerlink" title="优点"></a>优点</h2><p>将使用模板生成的项目打包成docker镜像，使其可以快速的安装和运行。另外在生成docker容器时添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">--restart=always</span><br></pre></td></tr></table></figure></p>
+<p>选项，即使服务挂掉也会自动重启，省去了运维工作(#\^.^#)</p>
+<h2 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h2><p>基于<a href="https://hub.docker.com/_/node/">node官方镜像</a>制作。</p>
+<ul>
+<li><p>Dockerfile</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">FROM node:8</span><br><span class="line">WORKDIR /app</span><br><span class="line">#安装模板脚本</span><br><span class="line">COPY install.sh /app</span><br><span class="line"># 配置镜像源</span><br><span class="line">RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak &amp;&amp; \</span><br><span class="line">    echo &quot;deb http://mirrors.163.com/debian/ jessie main non-free contrib&quot; &gt;/etc/apt/sources.list &amp;&amp; \</span><br><span class="line">    echo &quot;deb http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib&quot; &gt;&gt;/etc/apt/sources.list &amp;&amp; \</span><br><span class="line">    echo &quot;deb-src http://mirrors.163.com/debian/ jessie main non-free contrib&quot; &gt;&gt;/etc/apt/sources.list &amp;&amp; \</span><br><span class="line">    echo &quot;deb-src http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line"># 安装vue-cli</span><br><span class="line">RUN apt-get update &amp;&amp; apt-get -y install expect &amp;&amp; npm install -g vue-cli &amp;&amp; apt-get -y install net-tools</span><br><span class="line"># 安装模板</span><br><span class="line">RUN chmod +x install.sh &amp;&amp; ./install.sh</span><br><span class="line"></span><br><span class="line">WORKDIR /app/frontend</span><br><span class="line">#启动模板脚本</span><br><span class="line">COPY inrun.sh /app/frontend</span><br><span class="line"></span><br><span class="line">EXPOSE 8080 8081</span><br><span class="line">#CMD [ &quot;npm&quot;, &quot;run&quot;, &quot;dev&quot; ]</span><br><span class="line">CMD [ &quot;sh&quot;, &quot;inrun.sh&quot; ]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>install.sh<br>下载项目模板并生成项目。Dockerfile使用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">#!/usr/bin/expect</span><br><span class="line">#等待从github上下载模板源码</span><br><span class="line">set timeout 200</span><br><span class="line">spawn vue init feiniao111/vueWebTemplate frontend</span><br><span class="line">expect (frontend)</span><br><span class="line">send &quot;\r&quot;</span><br><span class="line">set timeout 10</span><br><span class="line">expect (A*Vue.js*project)</span><br><span class="line">send &quot;\r&quot;</span><br><span class="line">expect fe)</span><br><span class="line">send &quot;\r&quot;</span><br><span class="line">expect &gt;)</span><br><span class="line">send &quot;\r&quot;</span><br><span class="line">expect elsewhere\r</span><br><span class="line">send &quot;\r&quot;</span><br><span class="line">#等待安装node依赖</span><br><span class="line">set timeout 5000</span><br><span class="line">expect myself</span><br><span class="line">send &quot;\r&quot;</span><br><span class="line"></span><br><span class="line">expect https://vuejs-templates.github.io/webpack</span><br><span class="line">send \003</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>inrun.sh<br>运行dev环境和mock环境。启动容器时执行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">#更改主机ip</span><br><span class="line">ip=`ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6|awk &apos;&#123;print $2&#125;&apos;|tr -d &quot;addr:&quot;`</span><br><span class="line">sed  -i &quot;s/host: &apos;localhost&apos;/host: &apos;$ip&apos;/&quot; config/index.js</span><br><span class="line">npm run dev&amp;</span><br><span class="line">npm run mock</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="制作镜像"><a href="#制作镜像" class="headerlink" title="制作镜像"></a>制作镜像</h2><p>在Dockerfile所在目录，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -t cm_vue_template:1.0 .</span><br></pre></td></tr></table></figure></p>
+<p>制作成功后，执行<code>docker images</code>查看该镜像<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY                 TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">cm_vue_template            1.0                 0cae166e736c        About an hour ago   977MB</span><br><span class="line"></span><br><span class="line">node                       8                   41a1f5b81103        10 days ago         673MB</span><br></pre></td></tr></table></figure></p>
+<p>可以看到，cm_vue_template:1.0有977MB，这是因为它的基础镜像node:8就有673MB（内置了svn、git、node等），并且cm_vue_template还安装好了运行vue项目所需的node依赖。注意：因为要从github上下载模板，由于网络的原因可能会制作失败，多试几次就好。</p>
+<h2 id="运行容器"><a href="#运行容器" class="headerlink" title="运行容器"></a>运行容器</h2><p>镜像生成后，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -d --name template -p 8080-8081:8080-8081 --restart=always cm_vue_template:1.0</span><br></pre></td></tr></table></figure></p>
+<p>注意这里暴露的8080是dev环境的端口，8081是mock环境，<code>--restart-always</code>可以在容器停止后重新启动。<br>容器运行成功后，执行<code>docker ps</code>,可以看到正在运行的template容器<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS                                                                  NAMES</span><br><span class="line">018a83d10925        cm_vue_template:1.0   &quot;sh inrun.sh&quot;            2 hours ago         Up 2 hours          0.0.0.0:8080-8081-&gt;8080-8081/tcp                                       template</span><br></pre></td></tr></table></figure></p>
+<h2 id="访问"><a href="#访问" class="headerlink" title="访问"></a>访问</h2><p>容器运行成功后,访问所在机器的ip+端口号，如：<br><a href="http://172.21.149.13:8080">http://172.21.149.13:8080</a><br><a href="http://172.21.149.13:8081">http://172.21.149.13:8081</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/02/04/docker/vue项目模板demo部署/" data-id="cjrq9rtxf000amwqxen2nnkxd" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-code review/Phabricator后台管理" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/04/code review/Phabricator后台管理/" class="article-date">
+  <time datetime="2019-02-04T09:10:42.000Z" itemprop="datePublished">2019-02-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/04/code review/Phabricator后台管理/">Phabricator后台管理</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="登录后台"><a href="#登录后台" class="headerlink" title="登录后台"></a>登录后台</h1><p>由于phabricator运行在docker容器中，因此需要进入到容器内部，执行：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it focused_jepsen /bin/bash</span><br></pre></td></tr></table></figure></p>
+<p>focused_jepsen是phabricator容器的名称，可以通过docker ps命令查找到。</p>
+<h1 id="路径"><a href="#路径" class="headerlink" title="路径"></a>路径</h1><p>/srv/phabricator/phabricator</p>
+<h1 id="管理员账号"><a href="#管理员账号" class="headerlink" title="管理员账号"></a>管理员账号</h1><ul>
+<li>账号：</li>
+<li>密码：</li>
+</ul>
+<h1 id="访问网址"><a href="#访问网址" class="headerlink" title="访问网址"></a>访问网址</h1><p><a href="http://pha.cmrd.com/">http://pha.cmrd.com/</a></p>
+<hr>
+<p>需配置hosts  </p>
+<ul>
+<li>windows系统<br>C:\Windows\System32\drivers\etc\HOSTS 文件</li>
+<li>linux系统<br>/etc/hosts 文件<br>增加一行ip映射<br>172.21.149.13  pha.cmrd.com</li>
+</ul>
+<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><h2 id="邮件发不出来，但其他功能正常"><a href="#邮件发不出来，但其他功能正常" class="headerlink" title="邮件发不出来，但其他功能正常"></a>邮件发不出来，但其他功能正常</h2><p>检查后台进程是否正常，可以重启试试，重启方法：到pha目录下执行<br>bin/phd restart</p>
+<h2 id="无法启动"><a href="#无法启动" class="headerlink" title="无法启动"></a>无法启动</h2><p>检查php、mysql、nginx是否启动正常。</p>
+<ul>
+<li><p>php</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/sbin/php-fpm</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>mysql<br>检查mysql容器是否运行正常：执行docker ps能找到mysql容器，并可以通过</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -uroot -P 3308 -h 172.21.149.136 -p</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>密码a123456A~,连接到mysql。</p>
+<ul>
+<li>nginx<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/sbin/nginx -s reload</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="未知问题"><a href="#未知问题" class="headerlink" title="未知问题"></a>未知问题</h2><p>登录后，查看页面顶端左边菜单栏中的Unresolved Setup Issues</p>
+<h1 id="资料查询"><a href="#资料查询" class="headerlink" title="资料查询"></a>资料查询</h1><ul>
+<li>官方文档<br><a href="https://secure.phabricator.com">https://secure.phabricator.com</a></li>
+<li>中文站<br><a href="https://phabricator.webfuns.net">https://phabricator.webfuns.net</a></li>
+</ul>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/02/04/code review/Phabricator后台管理/" data-id="cjrq9rtx60004mwqxbh1swmat" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/code-review/">code-review</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-docker/Phabricator部署-docker" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/04/docker/Phabricator部署-docker/" class="article-date">
+  <time datetime="2019-02-04T09:01:18.000Z" itemprop="datePublished">2019-02-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/04/docker/Phabricator部署-docker/">Phabricator部署(docker)</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h2><p>Phabricator的部署改用了docker容器的方式，相比传统安装方式，具有以下特点：</p>
+<ul>
+<li>能够更快速的安装，并省去配置环节。传统方式需要安装nginx、php-fpm、mysql、python，并对它们进行配置，比较繁琐。采用docker部署后，只需要从docker-hub上下载两个镜像（mysql，phabricator），启用容器，即完成了部署，无需额外配置。</li>
+<li>轻松移植到其他服务器。由于镜像都是开源的，并托管到docker-hub上，因此可以方便地在不同服务器上移植。</li>
+</ul>
+<h2 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h2><h3 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h3><p>推荐采用新的稳定版本，本文采用的是17.12.1-ce。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]# docker version</span><br><span class="line">Client:</span><br><span class="line"> Version:	17.12.1-ce</span><br><span class="line"> API version:	1.35</span><br><span class="line"> Go version:	go1.9.4</span><br><span class="line"> Git commit:	7390fc6</span><br><span class="line"> Built:	Tue Feb 27 22:15:20 2018</span><br><span class="line"> OS/Arch:	linux/amd64</span><br><span class="line"></span><br><span class="line">Server:</span><br><span class="line"> Engine:</span><br><span class="line">  Version:	17.12.1-ce</span><br><span class="line">  API version:	1.35 (minimum version 1.12)</span><br><span class="line">  Go version:	go1.9.4</span><br><span class="line">  Git commit:	7390fc6</span><br><span class="line">  Built:	Tue Feb 27 22:17:54 2018</span><br><span class="line">  OS/Arch:	linux/amd64</span><br><span class="line">  Experimental:	false</span><br></pre></td></tr></table></figure></p>
+<h3 id="mysql镜像"><a href="#mysql镜像" class="headerlink" title="mysql镜像"></a><a href="https://hub.docker.com/_/mysql/">mysql镜像</a></h3><p>这里采用的是经典的5.6.35版本，下载命令：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull mysql:5.6.35</span><br></pre></td></tr></table></figure></p>
+<p>注意这个mysql还需要对配置文件进行调整，才能完美适配phabricator，具体见下文安装小节。</p>
+<h3 id="phabricator镜像"><a href="#phabricator镜像" class="headerlink" title="phabricator镜像"></a><a href="https://hub.docker.com/r/hachque/phabricator/">phabricator镜像</a></h3><p>已经有大牛将phabricator镜像上传到了docker-hub，直接使用就好，该镜像集成了所需环境（pha源码，nginx，php-fpm，python），虽然有1.21GB，不过对我们来说是完全可接受的。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull hachque/phabricator</span><br></pre></td></tr></table></figure></p>
+<p>下载完以上两个镜像，执行<code>docker images</code>，可以看到<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY                 TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">hachque/phabricator        latest              29e3817de0d2        5 weeks ago         1.21GB</span><br><span class="line">mysql                      5.6.35              a0f5d7301767        12 months ago       329MB</span><br></pre></td></tr></table></figure></p>
+<h3 id="数据持久化"><a href="#数据持久化" class="headerlink" title="数据持久化"></a>数据持久化</h3><p>由于容器无法持久化数据，删除容器就会丢失数据，因此需要在宿主机上准备目录用于存储mysql和phabricator的数据。</p>
+<ul>
+<li>mysql  </li>
+</ul>
+<ol>
+<li>建立/home/docker/appData/pha_mysql_data/目录，用来存放mysql的数据库文件；</li>
+<li>建立/home/docker/appData/pha_mysql_conf.d/目录，用来存放mysql的pha配置文件。将mysql的配置文件拷贝到该目录下，这个配置文件是根据pha官网配置的，具体见附录。</li>
+</ol>
+<ul>
+<li>phabricator<br>建立/home/docker/appData/pha_repos目录，用来作为pha的repo；</li>
+</ul>
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>执行脚本<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">set -x</span><br><span class="line">MYSQL_DATA_DIR=/home/docker/appData/pha_mysql_data/</span><br><span class="line">MYSQL_PORT=3308</span><br><span class="line">MYSQL_CONF_DIR=/home/docker/appData/pha_mysql_conf.d/</span><br><span class="line">MYSQL_PASSWORD=a123456A~</span><br><span class="line">MYSQL_HOST=172.21.149.13</span><br><span class="line">PHA_HOST=pha.cmrd.com</span><br><span class="line">PHA_REPOS=/home/docker/appData/pha_repos</span><br><span class="line"></span><br><span class="line">#启动mysql容器</span><br><span class="line">docker run -d --name pha_mysql \</span><br><span class="line">        -p $&#123;MYSQL_PORT&#125;:3306 \</span><br><span class="line">        -v $&#123;MYSQL_DATA_DIR&#125;:/var/lib/mysql \</span><br><span class="line">        -v $&#123;MYSQL_CONF_DIR&#125;:/etc/mysql/conf.d  \</span><br><span class="line">        -e MYSQL_ROOT_PASSWORD=$&#123;MYSQL_PASSWORD&#125; \</span><br><span class="line">        --restart=always \</span><br><span class="line">        mysql:5.6.35</span><br><span class="line"></span><br><span class="line">#启动docker容器</span><br><span class="line">docker run \</span><br><span class="line">    -p 80:80 -p 443:443 -p 23:22 \</span><br><span class="line">    --env PHABRICATOR_HOST=$&#123;PHA_HOST&#125; \</span><br><span class="line">    --env MYSQL_HOST=$&#123;MYSQL_HOST&#125; \</span><br><span class="line">    --env MYSQL_PORT=$&#123;MYSQL_PORT&#125; \</span><br><span class="line">    --env MYSQL_USER=root \</span><br><span class="line">    --env MYSQL_PASS=$&#123;MYSQL_PASSWORD&#125; \</span><br><span class="line">    --env PHABRICATOR_REPOSITORY_PATH=/repos \</span><br><span class="line">    -v $&#123;PHA_REPOS&#125;:/repos \</span><br><span class="line">    --restart=always \</span><br><span class="line">    hachque/phabricator</span><br></pre></td></tr></table></figure></p>
+<p>执行完该脚本，会产生两个容器，皆处于运行状态<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost pha_mysql_data]# docker ps</span><br><span class="line">CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS                                                                  NAMES</span><br><span class="line">4f7366e65be0        hachque/phabricator   &quot;/bin/bash /app/init…&quot;   About an hour ago   Up About an hour    0.0.0.0:80-&gt;80/tcp, 24/tcp, 0.0.0.0:443-&gt;443/tcp, 0.0.0.0:23-&gt;22/tcp   focused_jepsen</span><br><span class="line">a84101824751        mysql:5.6.35          &quot;docker-entrypoint.s…&quot;   About an hour ago   Up About an hour    0.0.0.0:3308-&gt;3306/tcp                                                 pha_mysql</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li>pha_mysql是mysql容器，提供mysql功能，对宿主机曝露端口为3308，用户名root，密码a123456A~；</li>
+<li>focused_jepsen是phabricator容器，使用了pha_mysql容器来作为数据库，使用了宿主机的3个端口：80（http），443（https），23（ssh）。首页为<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://pha.cmrd.com</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>==注意==游览器所在的电脑要配置host，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">172.21.149.13  pha.cmrd.com</span><br></pre></td></tr></table></figure></p>
+<p>访问<a href="">http://pha.cmrd.com</a>或者<a href="">http://pha.cmrd.com:80</a>，正常会跳至管理员账号设置页，说明phabricator已经部署完成。</p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="mysql配置文件"><a href="#mysql配置文件" class="headerlink" title="mysql配置文件"></a>mysql配置文件</h3><p>mysql的配置文件pha_mysql.cnf, 存放在宿主机的/home/docker/appData/pha_mysql_conf.d/：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#针对phabricator的mysql配置</span><br><span class="line">[mysqld]</span><br><span class="line">character_set_server=utf8</span><br><span class="line">init_connect=&apos;SET NAMES utf8&apos;</span><br><span class="line">max_allowed_packet=33554432</span><br><span class="line">sql_mode=STRICT_ALL_TABLES</span><br><span class="line">innodb_buffer_pool_size=1600M</span><br></pre></td></tr></table></figure></p>
+<p>注意pha_mysql.cnf的权限必须是644，否则mysql可能拒绝采用。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/02/04/docker/Phabricator部署-docker/" data-id="cjrq9rtx70005mwqxr4sy6i64" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/code-review/">code-review</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-docker/Poseidon主页部署" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/02/04/docker/Poseidon主页部署/" class="article-date">
@@ -76,7 +368,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/02/04/docker/Poseidon主页部署/">Poseidon主页部署.md</a>
+      <a class="article-title" href="/2019/02/04/docker/Poseidon主页部署/">Poseidon主页部署(docker)</a>
     </h1>
   
 
@@ -147,32 +439,11 @@ A[4. 重启容器]</pre>
 <h4 id="运行容器"><a href="#运行容器" class="headerlink" title="运行容器"></a>运行容器</h4><p>镜像生成后，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">docker run -d --name poseidon \</span><br><span class="line">        -p 8085-8086:8085-8086 \</span><br><span class="line">        --restart=always \</span><br><span class="line">         poseidon:1.0</span><br></pre></td></tr></table></figure></p>
 <p>容器运行成功后，执行<code>docker ps</code>，可以看到正在运行的poseidon容器<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS                                                                                NAMES</span><br><span class="line">55207fb97f0c        poseidon:1.0          &quot;sh inrun.sh&quot;            5 minutes ago       Up 5 minutes        0.0.0.0:8085-8086-&gt;8085-8086/tcp                                                     poseidon</span><br></pre></td></tr></table></figure></p>
 <h3 id="访问"><a href="#访问" class="headerlink" title="访问"></a>访问</h3><p>容器运行成功后，访问所在机器的ip+端口号，（需要耐心再等待几分钟，等待node server的完全启动）<br>如：<br><a href="http://172.21.149.13:8085">http://172.21.149.13:8085</a></p>
-<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="svg代码"><a href="#svg代码" class="headerlink" title="svg代码"></a>svg代码</h3><h4 id="传统-1"><a href="#传统-1" class="headerlink" title="传统"></a>传统</h4><p>启动主页</p>
-<pre class="mermaid">graph LR
 
-A[1. 安装node, svn]-->B[2. 从svn上下载源代码]
-B-->C[3. 安装依赖插件]
-C-->D[4. 启动主页]</pre>
-更新主页
-
-<pre class="mermaid">graph LR
-A[5. 停止node server]-->B[6. svn update]
-B-->C[7. 安装依赖插件, 若package.json更新]
-C-->D[8. 启动主页]</pre>
-
-
-<h4 id="docker-1"><a href="#docker-1" class="headerlink" title="docker"></a>docker</h4><p>启动主页</p>
-<pre class="mermaid">graph LR
-A[1. 安装docker]-->B[2. 下载poseidon镜像]
-B-->C[3. 启动一个容器]</pre>
-更新主页
-
-<pre class="mermaid">graph LR
-A[4. 重启容器]</pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/02/04/docker/Poseidon主页部署/" data-id="cjrq3ijjj0006msqxmbybpgca" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/02/04/docker/Poseidon主页部署/" data-id="cjrq9rtxm000emwqxnnz5gvux" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
@@ -184,9 +455,9 @@ A[4. 重启容器]</pre>
 
 
   
-    <article id="post-code review/如何生成完整的diff文件-md" class="article article-type-post" itemscope="" itemprop="blogPost">
+    <article id="post-code review/如何生成完整的diff文件" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2019/02/04/code review/如何生成完整的diff文件-md/" class="article-date">
+    <a href="/2019/02/04/code review/如何生成完整的diff文件/" class="article-date">
   <time datetime="2019-02-04T06:38:08.000Z" itemprop="datePublished">2019-02-04</time>
 </a>
     
@@ -198,7 +469,7 @@ A[4. 重启容器]</pre>
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/02/04/code review/如何生成完整的diff文件-md/">如何生成完整的diff文件.md</a>
+      <a class="article-title" href="/2019/02/04/code review/如何生成完整的diff文件/">如何生成完整的diff文件</a>
     </h1>
   
 
@@ -218,7 +489,7 @@ A[4. 重启容器]</pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/02/04/code review/如何生成完整的diff文件-md/" data-id="cjrq3ijj20002msqxnzvqt5ms" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/02/04/code review/如何生成完整的diff文件/" data-id="cjrq9rtwy0001mwqx2b7y8e58" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/code-review/">code-review</a></li></ul>
@@ -244,7 +515,7 @@ A[4. 重启容器]</pre>
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/02/04/code review/phabricator平台简明使用教程-md/">phabricator平台简明使用教程.md</a>
+      <a class="article-title" href="/2019/02/04/code review/phabricator平台简明使用教程-md/">Phabricator平台简明使用教程</a>
     </h1>
   
 
@@ -264,7 +535,7 @@ A[4. 重启容器]</pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/02/04/code review/phabricator平台简明使用教程-md/" data-id="cjrq3ijiy0001msqxd6qhtyiw" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/02/04/code review/phabricator平台简明使用教程-md/" data-id="cjrq9rtwr0000mwqxnai6ttmp" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/code-review/">code-review</a></li></ul>
@@ -290,7 +561,7 @@ A[4. 重启容器]</pre>
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/02/04/vue/vue框架下的国际化-md/">vue/vue框架下的国际化.md</a>
+      <a class="article-title" href="/2019/02/04/vue/vue框架下的国际化-md/">vue框架下的国际化.md</a>
     </h1>
   
 
@@ -304,7 +575,7 @@ A[4. 重启容器]</pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/02/04/vue/vue框架下的国际化-md/" data-id="cjrq3ijjc0004msqxznxwulgy" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/02/04/vue/vue框架下的国际化-md/" data-id="cjrq9rtx40003mwqxi4tbrvo0" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/">vue</a></li></ul>
@@ -316,9 +587,9 @@ A[4. 重启容器]</pre>
 
 
   
-    <article id="post-vue/自动提交webapp-md" class="article article-type-post" itemscope="" itemprop="blogPost">
+    <article id="post-docker/自动提交webapp-md" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2019/02/02/vue/自动提交webapp-md/" class="article-date">
+    <a href="/2019/02/02/docker/自动提交webapp-md/" class="article-date">
   <time datetime="2019-02-02T14:20:06.000Z" itemprop="datePublished">2019-02-02</time>
 </a>
     
@@ -330,7 +601,7 @@ A[4. 重启容器]</pre>
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/02/02/vue/自动提交webapp-md/">自动提交webapp.md</a>
+      <a class="article-title" href="/2019/02/02/docker/自动提交webapp-md/">自动提交webapp.md</a>
     </h1>
   
 
@@ -341,11 +612,7 @@ A[4. 重启容器]</pre>
         <h2 id="背景——————多人提交编译代码容易引发冲突"><a href="#背景——————多人提交编译代码容易引发冲突" class="headerlink" title="背景——————多人提交编译代码容易引发冲突"></a>背景——————多人提交编译代码容易引发冲突</h2><p>现有很多项目采用vue+webpack构建，执行<code>npm run build</code>生成编译代码(通常是webapp)，该代码是压缩后的，如果是不同的开发人员提交，很容易出现代码冲突,此时需要本地下载最新代码，并将其从svn库删除，然后重新提交新代码：</p>
 <p>1.开发小A执行<code>npm run build</code>生成webapp(版本1), 并提交到svn<br>2.开发小B也执行<code>npm run build</code>生成webapp(版本2), 并提交到svn, 被系统告知需要update<br>3.小B清空webapp, 执行update更新, 得到webapp(版本1), 然后将webapp中的内容标记为delete, 然后执行<code>svn ci</code>从库中删除]<br>4.小B重新执行<code>npm run build</code>生成webapp(版本3), 然后add并提交到svn</p>
 <p>以上是理想的多人提交编译代码步骤，但如果疏忽操作不当，非常容易引发代码冲突，由于代码是压缩过的，难以修改！也许你会说，为啥不专门一个人负责编辑和提交webapp呢？事实是可以的，但也存在需要多人提交的情形（比如专门负责提交webapp到svn的哥们下班了，但此时又需要修改代码=！=）<br>针对以上情形，可以编写一个自助提交webapp的脚本，将上述步骤交由机器执行，简单不易错~</p>
-<h2 id="提交流程"><a href="#提交流程" class="headerlink" title="提交流程"></a>提交流程</h2><body><br><embed src="/images/自动提交webapp-流程.svg" width="400px"><br></body>
-
-<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><p>. auto-commit.sh<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line">set -x</span><br><span class="line">###########################################</span><br><span class="line">###自动编译、并提交webapp目录的内容到svn###</span><br><span class="line"># 1. 将该脚本置于前端frontend目录下</span><br><span class="line"># 2. 执行  sh  auto-commit.sh  $&#123;comment&#125;</span><br><span class="line">#</span><br><span class="line"># 适用的项目结构</span><br><span class="line"># |rj(rj_u, etc.)     项目根目录</span><br><span class="line"># |-- webapp     前端生产代码</span><br><span class="line"># |-- frontend   前端开发代码</span><br><span class="line"># |  |-- auto-commit.sh</span><br><span class="line"># 适用的svn客户端Tortoise SVN 1.9+</span><br><span class="line">###########################################</span><br><span class="line"></span><br><span class="line">comment=$1</span><br><span class="line">#检验评论长度，必须大于4个字符</span><br><span class="line">if [ $&#123;#comment&#125; -le 4 ];then</span><br><span class="line">    echo &quot;评论长度必须大于4个字符&quot;</span><br><span class="line">    echo &quot;Usage: sh auto-commit.sh \$&#123;comment&#125;&quot;</span><br><span class="line">    exit</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">sourcePath=`pwd`</span><br><span class="line">#校验脚本存放路径，必须置于前端frontend目录中</span><br><span class="line">if [ &quot;$&#123;sourcePath##*/&#125;&quot; != &quot;frontend&quot; ];then</span><br><span class="line">    echo &quot;脚本未置于frontend中，自动编译和部署无法生效&quot;</span><br><span class="line">    exit</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#编译前强制同步svn最新代码</span><br><span class="line">cd ..</span><br><span class="line">if [ -d webapp ];then</span><br><span class="line">    [ -d webapp.bak ] &amp;&amp; rm -rf webapp.bak</span><br><span class="line">    echo &quot;备份当前webapp为webapp.bak&quot;</span><br><span class="line">    mv webapp webapp.bak</span><br><span class="line">fi</span><br><span class="line">svn update</span><br><span class="line">if [ $? -ne 0 ];then</span><br><span class="line">    echo &quot;执行svn update出错，请检查&quot;</span><br><span class="line">    exit</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#如果webapp未托管到svn，托管之</span><br><span class="line">if [ ! -d  webapp ];then</span><br><span class="line">    echo &quot;不存在webapp目录，创建之&quot;</span><br><span class="line">    mkdir webapp</span><br><span class="line">    echo &quot;添加webapp目录到svn&quot;</span><br><span class="line">    svn add webapp</span><br><span class="line">    svn ci webapp -m &quot;添加webapp目录到svn&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#为了添加新编译代码中出现的新文件，需要先删除svn上的生产版本</span><br><span class="line">cd webapp</span><br><span class="line">buildPath=`pwd`</span><br><span class="line">if [ `ls|wc -l` -gt 0 ];then</span><br><span class="line">    svn delete *</span><br><span class="line">    echo &quot;删除svn上的生产版本&quot;</span><br><span class="line">    svn ci * -m &quot;删除之前的生产版本&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#编译代码</span><br><span class="line">echo &quot;执行代码编译&quot;</span><br><span class="line">cd $sourcePath</span><br><span class="line">npm run build</span><br><span class="line">if [ $? -ne 0 ];then</span><br><span class="line">    echo &quot;代码编译失败！请检查&quot;</span><br><span class="line">    exit</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#提交代码到svn</span><br><span class="line">cd $buildPath</span><br><span class="line">svn add *</span><br><span class="line">echo &quot;提交新代码&quot;</span><br><span class="line">svn ci * -m &quot;***自动提交***$&#123;comment&#125;&quot;</span><br></pre></td></tr></table></figure></p>
-<p>.流程图语法</p>
-<pre class="mermaid">graph TD;
+<h2 id="提交流程"><a href="#提交流程" class="headerlink" title="提交流程"></a>提交流程</h2><pre class="mermaid">graph TD;
     A[开始] --> B{判断是否有webapp目录}
     B -->|是| C[备份webapp目录并删除]
     C --> D
@@ -360,59 +627,16 @@ A[4. 重启容器]</pre>
     I --> J[将webapp下的文件提交到svn]
     J --> K[结束]</pre>
 
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><p>. auto-commit.sh<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line">set -x</span><br><span class="line">###########################################</span><br><span class="line">###自动编译、并提交webapp目录的内容到svn###</span><br><span class="line"># 1. 将该脚本置于前端frontend目录下</span><br><span class="line"># 2. 执行  sh  auto-commit.sh  $&#123;comment&#125;</span><br><span class="line">#</span><br><span class="line"># 适用的项目结构</span><br><span class="line"># |rj(rj_u, etc.)     项目根目录</span><br><span class="line"># |-- webapp     前端生产代码</span><br><span class="line"># |-- frontend   前端开发代码</span><br><span class="line"># |  |-- auto-commit.sh</span><br><span class="line"># 适用的svn客户端Tortoise SVN 1.9+</span><br><span class="line">###########################################</span><br><span class="line"></span><br><span class="line">comment=$1</span><br><span class="line">#检验评论长度，必须大于4个字符</span><br><span class="line">if [ $&#123;#comment&#125; -le 4 ];then</span><br><span class="line">    echo &quot;评论长度必须大于4个字符&quot;</span><br><span class="line">    echo &quot;Usage: sh auto-commit.sh \$&#123;comment&#125;&quot;</span><br><span class="line">    exit</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">sourcePath=`pwd`</span><br><span class="line">#校验脚本存放路径，必须置于前端frontend目录中</span><br><span class="line">if [ &quot;$&#123;sourcePath##*/&#125;&quot; != &quot;frontend&quot; ];then</span><br><span class="line">    echo &quot;脚本未置于frontend中，自动编译和部署无法生效&quot;</span><br><span class="line">    exit</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#编译前强制同步svn最新代码</span><br><span class="line">cd ..</span><br><span class="line">if [ -d webapp ];then</span><br><span class="line">    [ -d webapp.bak ] &amp;&amp; rm -rf webapp.bak</span><br><span class="line">    echo &quot;备份当前webapp为webapp.bak&quot;</span><br><span class="line">    mv webapp webapp.bak</span><br><span class="line">fi</span><br><span class="line">svn update</span><br><span class="line">if [ $? -ne 0 ];then</span><br><span class="line">    echo &quot;执行svn update出错，请检查&quot;</span><br><span class="line">    exit</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#如果webapp未托管到svn，托管之</span><br><span class="line">if [ ! -d  webapp ];then</span><br><span class="line">    echo &quot;不存在webapp目录，创建之&quot;</span><br><span class="line">    mkdir webapp</span><br><span class="line">    echo &quot;添加webapp目录到svn&quot;</span><br><span class="line">    svn add webapp</span><br><span class="line">    svn ci webapp -m &quot;添加webapp目录到svn&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#为了添加新编译代码中出现的新文件，需要先删除svn上的生产版本</span><br><span class="line">cd webapp</span><br><span class="line">buildPath=`pwd`</span><br><span class="line">if [ `ls|wc -l` -gt 0 ];then</span><br><span class="line">    svn delete *</span><br><span class="line">    echo &quot;删除svn上的生产版本&quot;</span><br><span class="line">    svn ci * -m &quot;删除之前的生产版本&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#编译代码</span><br><span class="line">echo &quot;执行代码编译&quot;</span><br><span class="line">cd $sourcePath</span><br><span class="line">npm run build</span><br><span class="line">if [ $? -ne 0 ];then</span><br><span class="line">    echo &quot;代码编译失败！请检查&quot;</span><br><span class="line">    exit</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#提交代码到svn</span><br><span class="line">cd $buildPath</span><br><span class="line">svn add *</span><br><span class="line">echo &quot;提交新代码&quot;</span><br><span class="line">svn ci * -m &quot;***自动提交***$&#123;comment&#125;&quot;</span><br></pre></td></tr></table></figure></p>
+
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/02/02/vue/自动提交webapp-md/" data-id="cjrq3ijjg0005msqxwdyck1kv" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/02/02/docker/自动提交webapp-md/" data-id="cjrq9rtyo000rmwqxhtdvncuh" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/">vue</a></li></ul>
 
-    </footer>
-  </div>
-  
-</article>
-
-
-  
-    <article id="post-hello-world" class="article article-type-post" itemscope="" itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/01/19/hello-world/" class="article-date">
-  <time datetime="2019-01-19T09:51:51.419Z" itemprop="datePublished">2019-01-19</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/19/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/19/hello-world/" data-id="cjrq3ijhh0000msqx923d84f2" class="article-share-link">Share</a>
-      
-      
     </footer>
   </div>
   
@@ -443,7 +667,7 @@ A[4. 重启容器]</pre>
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/code-review/" style="font-size: 20px;">code-review</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/vue/" style="font-size: 20px;">vue</a>
+      <a href="/tags/code-review/" style="font-size: 20px;">code-review</a> <a href="/tags/docker/" style="font-size: 20px;">docker</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a>
     </div>
   </div>
 
@@ -452,7 +676,7 @@ A[4. 重启容器]</pre>
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li></ul>
     </div>
   </div>
 
@@ -465,23 +689,23 @@ A[4. 重启容器]</pre>
       <ul>
         
           <li>
-            <a href="/2019/02/04/docker/Poseidon主页部署/">Poseidon主页部署.md</a>
+            <a href="/2019/02/04/docker/私有node仓库verdaccio部署-docker/">私有node仓库verdaccio部署(docker)</a>
           </li>
         
           <li>
-            <a href="/2019/02/04/code review/如何生成完整的diff文件-md/">如何生成完整的diff文件.md</a>
+            <a href="/2019/02/04/vue/vue项目模板/">vue项目模板</a>
           </li>
         
           <li>
-            <a href="/2019/02/04/code review/phabricator平台简明使用教程-md/">phabricator平台简明使用教程.md</a>
+            <a href="/2019/02/04/docker/vue项目模板demo部署/">vue项目模板demo部署(docker)</a>
           </li>
         
           <li>
-            <a href="/2019/02/04/vue/vue框架下的国际化-md/">vue/vue框架下的国际化.md</a>
+            <a href="/2019/02/04/code review/Phabricator后台管理/">Phabricator后台管理</a>
           </li>
         
           <li>
-            <a href="/2019/02/02/vue/自动提交webapp-md/">自动提交webapp.md</a>
+            <a href="/2019/02/04/docker/Phabricator部署-docker/">Phabricator部署(docker)</a>
           </li>
         
       </ul>

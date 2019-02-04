@@ -5,19 +5,19 @@
   
 
   
-  <title>Poseidon主页部署.md | Hexo</title>
+  <title>Poseidon主页部署(docker) | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="Poseidon主页作为介绍Poseidon如何安装及使用的网页，不同于Element主页(http://element.eleme.io)，它是以==node==作为http server，而不是apache或nginx。这么做的原因主要有两个：  方便开发人员调试。打开游览器调试工具（vue-devtool），就可以直接看到里面的组件实例运行时状态（路由、变量等）。 快速更新。直接运行从svn">
 <meta name="keywords" content="docker">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Poseidon主页部署.md">
+<meta property="og:title" content="Poseidon主页部署(docker)">
 <meta property="og:url" content="http://yoursite.com/2019/02/04/docker/Poseidon主页部署/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="Poseidon主页作为介绍Poseidon如何安装及使用的网页，不同于Element主页(http://element.eleme.io)，它是以==node==作为http server，而不是apache或nginx。这么做的原因主要有两个：  方便开发人员调试。打开游览器调试工具（vue-devtool），就可以直接看到里面的组件实例运行时状态（路由、变量等）。 快速更新。直接运行从svn">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-04T07:39:18.686Z">
+<meta property="og:updated_time" content="2019-02-04T09:05:13.636Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Poseidon主页部署.md">
+<meta name="twitter:title" content="Poseidon主页部署(docker)">
 <meta name="twitter:description" content="Poseidon主页作为介绍Poseidon如何安装及使用的网页，不同于Element主页(http://element.eleme.io)，它是以==node==作为http server，而不是apache或nginx。这么做的原因主要有两个：  方便开发人员调试。打开游览器调试工具（vue-devtool），就可以直接看到里面的组件实例运行时状态（路由、变量等）。 快速更新。直接运行从svn">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -79,7 +79,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      Poseidon主页部署.md
+      Poseidon主页部署(docker)
     </h1>
   
 
@@ -150,32 +150,11 @@ A[4. 重启容器]</pre>
 <h4 id="运行容器"><a href="#运行容器" class="headerlink" title="运行容器"></a>运行容器</h4><p>镜像生成后，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">docker run -d --name poseidon \</span><br><span class="line">        -p 8085-8086:8085-8086 \</span><br><span class="line">        --restart=always \</span><br><span class="line">         poseidon:1.0</span><br></pre></td></tr></table></figure></p>
 <p>容器运行成功后，执行<code>docker ps</code>，可以看到正在运行的poseidon容器<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS                                                                                NAMES</span><br><span class="line">55207fb97f0c        poseidon:1.0          &quot;sh inrun.sh&quot;            5 minutes ago       Up 5 minutes        0.0.0.0:8085-8086-&gt;8085-8086/tcp                                                     poseidon</span><br></pre></td></tr></table></figure></p>
 <h3 id="访问"><a href="#访问" class="headerlink" title="访问"></a>访问</h3><p>容器运行成功后，访问所在机器的ip+端口号，（需要耐心再等待几分钟，等待node server的完全启动）<br>如：<br><a href="http://172.21.149.13:8085">http://172.21.149.13:8085</a></p>
-<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="svg代码"><a href="#svg代码" class="headerlink" title="svg代码"></a>svg代码</h3><h4 id="传统-1"><a href="#传统-1" class="headerlink" title="传统"></a>传统</h4><p>启动主页</p>
-<pre class="mermaid">graph LR
 
-A[1. 安装node, svn]-->B[2. 从svn上下载源代码]
-B-->C[3. 安装依赖插件]
-C-->D[4. 启动主页]</pre>
-更新主页
-
-<pre class="mermaid">graph LR
-A[5. 停止node server]-->B[6. svn update]
-B-->C[7. 安装依赖插件, 若package.json更新]
-C-->D[8. 启动主页]</pre>
-
-
-<h4 id="docker-1"><a href="#docker-1" class="headerlink" title="docker"></a>docker</h4><p>启动主页</p>
-<pre class="mermaid">graph LR
-A[1. 安装docker]-->B[2. 下载poseidon镜像]
-B-->C[3. 启动一个容器]</pre>
-更新主页
-
-<pre class="mermaid">graph LR
-A[4. 重启容器]</pre>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/02/04/docker/Poseidon主页部署/" data-id="cjrq3ijjj0006msqxmbybpgca" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/02/04/docker/Poseidon主页部署/" data-id="cjrq9rtxm000emwqxnnz5gvux" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
@@ -186,10 +165,19 @@ A[4. 重启容器]</pre>
     
 <nav id="article-nav">
   
+    <a href="/2019/02/04/docker/Phabricator部署-docker/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
+        
+          Phabricator部署(docker)
+        
+      </div>
+    </a>
   
-    <a href="/2019/02/04/code review/如何生成完整的diff文件-md/" id="article-nav-older" class="article-nav-link-wrap">
+  
+    <a href="/2019/02/04/code review/如何生成完整的diff文件/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">如何生成完整的diff文件.md</div>
+      <div class="article-nav-title">如何生成完整的diff文件</div>
     </a>
   
 </nav>
@@ -218,7 +206,7 @@ A[4. 重启容器]</pre>
   <div class="widget-wrap">
     <h3 class="widget-title">Tag Cloud</h3>
     <div class="widget tagcloud">
-      <a href="/tags/code-review/" style="font-size: 20px;">code-review</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/vue/" style="font-size: 20px;">vue</a>
+      <a href="/tags/code-review/" style="font-size: 20px;">code-review</a> <a href="/tags/docker/" style="font-size: 20px;">docker</a> <a href="/tags/vue/" style="font-size: 10px;">vue</a>
     </div>
   </div>
 
@@ -227,7 +215,7 @@ A[4. 重启容器]</pre>
   <div class="widget-wrap">
     <h3 class="widget-title">Archives</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/01/">January 2019</a></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2019/02/">February 2019</a></li></ul>
     </div>
   </div>
 
@@ -240,23 +228,23 @@ A[4. 重启容器]</pre>
       <ul>
         
           <li>
-            <a href="/2019/02/04/docker/Poseidon主页部署/">Poseidon主页部署.md</a>
+            <a href="/2019/02/04/docker/私有node仓库verdaccio部署-docker/">私有node仓库verdaccio部署(docker)</a>
           </li>
         
           <li>
-            <a href="/2019/02/04/code review/如何生成完整的diff文件-md/">如何生成完整的diff文件.md</a>
+            <a href="/2019/02/04/vue/vue项目模板/">vue项目模板</a>
           </li>
         
           <li>
-            <a href="/2019/02/04/code review/phabricator平台简明使用教程-md/">phabricator平台简明使用教程.md</a>
+            <a href="/2019/02/04/docker/vue项目模板demo部署/">vue项目模板demo部署(docker)</a>
           </li>
         
           <li>
-            <a href="/2019/02/04/vue/vue框架下的国际化-md/">vue/vue框架下的国际化.md</a>
+            <a href="/2019/02/04/code review/Phabricator后台管理/">Phabricator后台管理</a>
           </li>
         
           <li>
-            <a href="/2019/02/02/vue/自动提交webapp-md/">自动提交webapp.md</a>
+            <a href="/2019/02/04/docker/Phabricator部署-docker/">Phabricator部署(docker)</a>
           </li>
         
       </ul>

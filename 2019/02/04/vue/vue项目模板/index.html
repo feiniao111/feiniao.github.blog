@@ -5,20 +5,20 @@
   
 
   
-  <title>vue框架下的国际化.md | Hexo</title>
+  <title>vue项目模板 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="公司项目有国际化的需求，并且网页端已经采用vue实现，因此需要设计支持多国语言的方案。其中，由于一些历史原因，我们的vue框架还包含了一些js、jq插件（例如富文本框ueditor，上传组件uploadifived等），这些插件也要实现国际化。 有道笔记">
+  <meta name="description" content="背景目前vue-cli官方提供的webpack模板，和实际组内项目有所区别，每次新建一个项目，都需要对用官方模板创建的项目做一些细节调整，具体包括:  输出目录改为webapp(默认为dist); 隐藏生产环境源码（默认可见); 安装项目依赖（jquery、node-sass等）等等，为了加快项目开发效率，有必要对现有项目进行梳理，提取出一套适用于CM web项目的webpack模板。  定制模板">
 <meta name="keywords" content="vue">
 <meta property="og:type" content="article">
-<meta property="og:title" content="vue框架下的国际化.md">
-<meta property="og:url" content="http://yoursite.com/2019/02/04/vue/vue框架下的国际化-md/index.html">
+<meta property="og:title" content="vue项目模板">
+<meta property="og:url" content="http://yoursite.com/2019/02/04/vue/vue项目模板/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="公司项目有国际化的需求，并且网页端已经采用vue实现，因此需要设计支持多国语言的方案。其中，由于一些历史原因，我们的vue框架还包含了一些js、jq插件（例如富文本框ueditor，上传组件uploadifived等），这些插件也要实现国际化。 有道笔记">
+<meta property="og:description" content="背景目前vue-cli官方提供的webpack模板，和实际组内项目有所区别，每次新建一个项目，都需要对用官方模板创建的项目做一些细节调整，具体包括:  输出目录改为webapp(默认为dist); 隐藏生产环境源码（默认可见); 安装项目依赖（jquery、node-sass等）等等，为了加快项目开发效率，有必要对现有项目进行梳理，提取出一套适用于CM web项目的webpack模板。  定制模板">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2019-02-04T09:03:58.784Z">
+<meta property="og:updated_time" content="2019-02-04T11:25:44.712Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="vue框架下的国际化.md">
-<meta name="twitter:description" content="公司项目有国际化的需求，并且网页端已经采用vue实现，因此需要设计支持多国语言的方案。其中，由于一些历史原因，我们的vue框架还包含了一些js、jq插件（例如富文本框ueditor，上传组件uploadifived等），这些插件也要实现国际化。 有道笔记">
+<meta name="twitter:title" content="vue项目模板">
+<meta name="twitter:description" content="背景目前vue-cli官方提供的webpack模板，和实际组内项目有所区别，每次新建一个项目，都需要对用官方模板创建的项目做一些细节调整，具体包括:  输出目录改为webapp(默认为dist); 隐藏生产环境源码（默认可见); 安装项目依赖（jquery、node-sass等）等等，为了加快项目开发效率，有必要对现有项目进行梳理，提取出一套适用于CM web项目的webpack模板。  定制模板">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -65,10 +65,10 @@
   </div>
 </header>
       <div class="outer">
-        <section id="main"><article id="post-vue/vue框架下的国际化-md" class="article article-type-post" itemscope="" itemprop="blogPost">
+        <section id="main"><article id="post-vue/vue项目模板" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2019/02/04/vue/vue框架下的国际化-md/" class="article-date">
-  <time datetime="2019-02-04T05:21:09.000Z" itemprop="datePublished">2019-02-04</time>
+    <a href="/2019/02/04/vue/vue项目模板/" class="article-date">
+  <time datetime="2019-02-04T09:29:26.000Z" itemprop="datePublished">2019-02-04</time>
 </a>
     
   </div>
@@ -79,7 +79,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      vue框架下的国际化.md
+      vue项目模板
     </h1>
   
 
@@ -87,13 +87,19 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>公司项目有国际化的需求，并且网页端已经采用vue实现，因此需要设计支持多国语言的方案。其中，由于一些历史原因，我们的vue框架还包含了一些js、jq插件（例如富文本框ueditor，上传组件uploadifived等），这些插件也要实现国际化。</p>
-<p><a href="http://note.youdao.com/noteshare?id=93a785dac7d94ff72949c16109bca807&sub=FF72FBD486774A2B8FA687383BBC6B18" target="_blank">有道笔记</a></p>
+        <p>背景<br>目前vue-cli官方提供的webpack模板，和实际组内项目有所区别，每次新建一个项目，都需要对用官方模板创建的项目做一些细节调整，具体包括:</p>
+<ol>
+<li>输出目录改为webapp(默认为dist);</li>
+<li>隐藏生产环境源码（默认可见);</li>
+<li>安装项目依赖（jquery、node-sass等）<br>等等，为了加快项目开发效率，有必要对现有项目进行梳理，提取出一套适用于CM web项目的webpack模板。</li>
+</ol>
+<p>定制模板<br>vue-cli提供了定制模板的方法，允许开发团队定制自己的个性模板。这里大致介绍一下我们的定制模板的功能以及目录结构。<br>功能<br>  ● 国际化<br>  ● 服务器代理<br>  ● 提供mock环境<br>  ● 预置jquery, node-sass, vue-router, vuex, mockjs等常用插件<br>  ● 生产环境代码隐藏<br>  ● 编译产出目录为webapp</p>
+<p><a href="http://note.youdao.com/noteshare?id=366f5d0692c89c7a0d5f44683719bded&sub=F04160B34B874315AB9435EA15459460" target="_blank">项目模板</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/02/04/vue/vue框架下的国际化-md/" data-id="cjrq9rtx40003mwqxi4tbrvo0" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/02/04/vue/vue项目模板/" data-id="cjrq9rtxc0008mwqx6acd3wce" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/">vue</a></li></ul>
@@ -104,19 +110,19 @@
     
 <nav id="article-nav">
   
-    <a href="/2019/02/04/code review/phabricator平台简明使用教程-md/" id="article-nav-newer" class="article-nav-link-wrap">
+    <a href="/2019/02/04/docker/私有node仓库verdaccio部署-docker/" id="article-nav-newer" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Newer</strong>
       <div class="article-nav-title">
         
-          Phabricator平台简明使用教程
+          私有node仓库verdaccio部署(docker)
         
       </div>
     </a>
   
   
-    <a href="/2019/02/02/docker/自动提交webapp-md/" id="article-nav-older" class="article-nav-link-wrap">
+    <a href="/2019/02/04/docker/vue项目模板demo部署/" id="article-nav-older" class="article-nav-link-wrap">
       <strong class="article-nav-caption">Older</strong>
-      <div class="article-nav-title">自动提交webapp.md</div>
+      <div class="article-nav-title">vue项目模板demo部署(docker)</div>
     </a>
   
 </nav>
