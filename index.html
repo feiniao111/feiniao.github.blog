@@ -62,6 +62,260 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-docker/Poseidon主页部署" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/04/docker/Poseidon主页部署/" class="article-date">
+  <time datetime="2019-02-04T07:31:05.000Z" itemprop="datePublished">2019-02-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/04/docker/Poseidon主页部署/">Poseidon主页部署.md</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Poseidon主页作为介绍Poseidon如何安装及使用的网页，不同于Element主页(<a href="http://element.eleme.io)，它是以==node==作为http">http://element.eleme.io)，它是以==node==作为http</a> server，而不是apache或nginx。这么做的原因主要有两个：</p>
+<ol>
+<li>方便开发人员调试。<br>打开游览器调试工具（vue-devtool），就可以直接看到里面的组件实例运行时状态（路由、变量等）。</li>
+<li>快速更新。<br>直接运行从svn下载的代码，没有压缩和额外部署过程。当主页代码有更新时，只要执行svn update，然后重启node server即可。  </li>
+</ol>
+<hr>
+<p>下面介绍传统部署方式和docker部署的区别，以及docker部署的具体实现。</p>
+<h2 id="部署流程"><a href="#部署流程" class="headerlink" title="部署流程"></a>部署流程</h2><h3 id="传统"><a href="#传统" class="headerlink" title="传统"></a>传统</h3><p>启动主页</p>
+<pre class="mermaid">graph LR
+
+A[1. 安装node, svn]-->B[2. 从svn上下载源代码]
+B-->C[3. 安装依赖插件]
+C-->D[4. 启动主页]</pre>
+更新主页
+
+<pre class="mermaid">graph LR
+A[5. 停止node server]-->B[6. svn update]
+B-->C[7. 安装依赖插件, 若package.json更新]
+C-->D[8. 启动主页]</pre>
+
+
+<h3 id="docker"><a href="#docker" class="headerlink" title="docker"></a>docker</h3><p>启动主页</p>
+<pre class="mermaid">graph LR
+A[1. 安装docker]-->B[2. 下载poseidon镜像]
+B-->C[3. 启动一个容器]</pre>
+更新主页
+
+<pre class="mermaid">graph LR
+A[4. 重启容器]</pre>
+
+<h3 id="两种方式对比"><a href="#两种方式对比" class="headerlink" title="两种方式对比"></a>两种方式对比</h3><ul>
+<li>优点<br>从整体来看，docker部署比传统部署方式在启动、更新上都更简单，尤其是在更新时。实际上，docker部署方式还更加快速。传统方式的步骤2、3的时间开销通常在15分钟左右。而docker方式的下载poseidon镜像的时间只要1分钟左右。</li>
+<li>缺点<br>poseidon主页每次更新，都需要重启容器。而每次启动容器都需要等待几分钟（启动node server）。实际上，由于存在热部署，一些更新是不需要重启server的，这时候传统方式就比较快捷。不过，docker这种重启容器来更新网页的方式还是非常酷的=！=</li>
+</ul>
+<h2 id="docker部署"><a href="#docker部署" class="headerlink" title="docker部署"></a>docker部署</h2><h3 id="sketch"><a href="#sketch" class="headerlink" title="sketch"></a>sketch</h3><p>包含镜像的制作和容器启动两个部分。<br>实际上，镜像中包含了传统方式的步骤2、3，即：  </p>
+<hr>
+<p><strong>posedion镜像</strong> = 从svn上下载主页源代码 + 安装依赖插件。  </p>
+<hr>
+<p>当我们下载好镜像后，就已经完成了poseidon主页源代码下载和依赖插件的安装。<br>相应地，容器启动时，会去执行传统方式的步骤6、7、8，即：</p>
+<hr>
+<p><strong>启动容器</strong> = svn update + 安装依赖插件, 若package.json更新 + 启动主页</p>
+<hr>
+<h3 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h3><h4 id="Dockerfile"><a href="#Dockerfile" class="headerlink" title="Dockerfile"></a>Dockerfile</h4><p>基于<a href="https://hub.docker.com/_/node/">node官方镜像</a>制作。</p>
+<ul>
+<li><p>Dockerfile</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">FROM node:8</span><br><span class="line">WORKDIR /app</span><br><span class="line">#安装脚本</span><br><span class="line">COPY install.sh /app</span><br><span class="line"># 配置镜像源</span><br><span class="line">RUN mv /etc/apt/sources.list /etc/apt/sources.list.bak &amp;&amp; \</span><br><span class="line">    echo &quot;deb http://mirrors.163.com/debian/ jessie main non-free contrib&quot; &gt;/etc/apt/sources.list &amp;&amp; \</span><br><span class="line">    echo &quot;deb http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib&quot; &gt;&gt;/etc/apt/sources.list &amp;&amp; \</span><br><span class="line">    echo &quot;deb-src http://mirrors.163.com/debian/ jessie main non-free contrib&quot; &gt;&gt;/etc/apt/sources.list &amp;&amp; \</span><br><span class="line">    echo &quot;deb-src http://mirrors.163.com/debian/ jessie-proposed-updates main non-free contrib&quot; &gt;&gt;/etc/apt/sources.list</span><br><span class="line"></span><br><span class="line">RUN apt-get update &amp;&amp; apt-get -y install net-tools</span><br><span class="line"># 安装组件库及依赖</span><br><span class="line">RUN chmod +x install.sh &amp;&amp; ./install.sh</span><br><span class="line"></span><br><span class="line">WORKDIR /app/FECompLibrary</span><br><span class="line">#启动组件库脚本</span><br><span class="line">COPY inrun.sh /app/FECompLibrary</span><br><span class="line"></span><br><span class="line">EXPOSE 8085</span><br><span class="line">CMD [ &quot;sh&quot;, &quot;inrun.sh&quot; ]</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>install.sh<br>下载Poseidon主页代码，并安装依赖插件。Dockerfile使用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">#从svn上下载代码</span><br><span class="line">set -x</span><br><span class="line"></span><br><span class="line">#设置svn账号密码</span><br><span class="line">svn_user=你的svn账号</span><br><span class="line">svn_pass=你的svn密码</span><br><span class="line"></span><br><span class="line">svn co http://svn.ruijie.net/svn/RCD/Brunches/FECompLibrary --username $&#123;svn_user&#125; --password $&#123;svn_pass&#125;</span><br><span class="line"></span><br><span class="line">if [ $? -ne 0 ];then</span><br><span class="line">    echo &quot;svn账号密码不对&quot;</span><br><span class="line">    exit 1</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">psdPath=`pwd`/FECompLibrary/poseidon</span><br><span class="line">elePath=`pwd`/FECompLibrary/element</span><br><span class="line"></span><br><span class="line">#安装依赖</span><br><span class="line">cd $&#123;elePath&#125;</span><br><span class="line">npm install</span><br><span class="line">cd $&#123;psdPath&#125;</span><br><span class="line">npm i element-ui-themecustom --registry http://172.21.149.14:4873</span><br><span class="line">npm install node-sass --registry https://registry.npm.taobao.org</span><br><span class="line">npm install phantomjs-prebuilt@2.1.14 --ignore-script</span><br><span class="line">npm install</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>==注意==上面的svn账号、密码，node仓库ip（172.21.149.13），请根据实际替换为当前的值。</p>
+<ul>
+<li>inrun.sh<br>启动容器时的执行脚本。会更新主页代码，安装依赖插件，并启动Poseidon。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">## ensure current path is /app/FECompLibrary </span><br><span class="line">set -x</span><br><span class="line">#设置svn账号密码</span><br><span class="line">svn_user=你的svn账号</span><br><span class="line">svn_pass=你的svn密码</span><br><span class="line"></span><br><span class="line">#设置宿主机ip，用来处理posedion和element间通信时的跨域问题</span><br><span class="line">host_ip=172.21.149.13</span><br><span class="line">#node仓库ip，该仓库存放了组件库</span><br><span class="line">node_repo=&apos;&apos;</span><br><span class="line"></span><br><span class="line">svn update --username $&#123;svn_user&#125; --password $&#123;svn_pass&#125;</span><br><span class="line"></span><br><span class="line">#获取容器ip</span><br><span class="line">cip=`ifconfig -a|grep inet|grep -v 127.0.0.1|grep -v inet6|awk &apos;&#123;print $2&#125;&apos;|tr -d &quot;addr:&quot;`</span><br><span class="line"></span><br><span class="line">#替换ip为容器ip</span><br><span class="line">cd poseidon</span><br><span class="line">sed -i &quot;s/172.21.149.14/$&#123;host_ip&#125;/&quot; examples/index.tpl</span><br><span class="line">sed -i &quot;s/172.21.149.14/$&#123;host_ip&#125;/&quot; examples/thirdRepo.config.js</span><br><span class="line">sed -i &quot;s/172.21.149.14/$&#123;host_ip&#125;/&quot; examples/docs/zh-CN/icon.md</span><br><span class="line"></span><br><span class="line">cd ../element</span><br><span class="line">sed -i &quot;s/172.21.149.14/$&#123;host_ip&#125;/&quot; examples/index.tpl</span><br><span class="line"></span><br><span class="line">#替换node仓库ip，若有。注意默认端口不变，还是4873</span><br><span class="line">if [ &quot;$node_repo&quot; != &apos;&apos; ];then</span><br><span class="line">    :</span><br><span class="line">    cd ../poseidon</span><br><span class="line">    sed -i &quot;s/172.21.149.14/$&#123;node_repo&#125;/&quot; examples/docs/zh-CN/custom-theme.md</span><br><span class="line">    sed -i &quot;s/172.21.149.14/$&#123;node_repo&#125;/&quot; examples/docs/zh-CN/installation.md</span><br><span class="line">    sed -i &quot;s/172.21.149.14/$&#123;node_repo&#125;/&quot; examples/docs/zh-CN/quickstart.md</span><br><span class="line"></span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">cd ../element</span><br><span class="line">npm install</span><br><span class="line">npm run dev&amp;</span><br><span class="line"></span><br><span class="line">cd ../poseidon</span><br><span class="line">npm install</span><br><span class="line">npm run dev</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>==注意==该脚本中，host_ip为当前宿主机ip，node_repo为组件库存放的node仓库ip，请根据需要更改。</p>
+<h4 id="制作镜像"><a href="#制作镜像" class="headerlink" title="制作镜像"></a>制作镜像</h4><p>在Dockerfile所在目录，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">set -x</span><br><span class="line">docker build -t poseidon:1.0  .</span><br></pre></td></tr></table></figure></p>
+<p>制作成功后，执行docker images查看该镜像<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">REPOSITORY                  TAG                 IMAGE ID            CREATED             SIZE</span><br><span class="line">poseidon                    1.0                 c093c09dbcc7        7 minutes ago       1.27GB</span><br></pre></td></tr></table></figure></p>
+<p>==注意==：由于网络原因，制作过程中下载依赖插件可能会失败，请多试几次。</p>
+<h4 id="运行容器"><a href="#运行容器" class="headerlink" title="运行容器"></a>运行容器</h4><p>镜像生成后，执行<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/bash</span><br><span class="line">docker run -d --name poseidon \</span><br><span class="line">        -p 8085-8086:8085-8086 \</span><br><span class="line">        --restart=always \</span><br><span class="line">         poseidon:1.0</span><br></pre></td></tr></table></figure></p>
+<p>容器运行成功后，执行<code>docker ps</code>，可以看到正在运行的poseidon容器<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">CONTAINER ID        IMAGE                 COMMAND                  CREATED             STATUS              PORTS                                                                                NAMES</span><br><span class="line">55207fb97f0c        poseidon:1.0          &quot;sh inrun.sh&quot;            5 minutes ago       Up 5 minutes        0.0.0.0:8085-8086-&gt;8085-8086/tcp                                                     poseidon</span><br></pre></td></tr></table></figure></p>
+<h3 id="访问"><a href="#访问" class="headerlink" title="访问"></a>访问</h3><p>容器运行成功后，访问所在机器的ip+端口号，（需要耐心再等待几分钟，等待node server的完全启动）<br>如：<br><a href="http://172.21.149.13:8085">http://172.21.149.13:8085</a></p>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="svg代码"><a href="#svg代码" class="headerlink" title="svg代码"></a>svg代码</h3><h4 id="传统-1"><a href="#传统-1" class="headerlink" title="传统"></a>传统</h4><p>启动主页</p>
+<pre class="mermaid">graph LR
+
+A[1. 安装node, svn]-->B[2. 从svn上下载源代码]
+B-->C[3. 安装依赖插件]
+C-->D[4. 启动主页]</pre>
+更新主页
+
+<pre class="mermaid">graph LR
+A[5. 停止node server]-->B[6. svn update]
+B-->C[7. 安装依赖插件, 若package.json更新]
+C-->D[8. 启动主页]</pre>
+
+
+<h4 id="docker-1"><a href="#docker-1" class="headerlink" title="docker"></a>docker</h4><p>启动主页</p>
+<pre class="mermaid">graph LR
+A[1. 安装docker]-->B[2. 下载poseidon镜像]
+B-->C[3. 启动一个容器]</pre>
+更新主页
+
+<pre class="mermaid">graph LR
+A[4. 重启容器]</pre>
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/02/04/docker/Poseidon主页部署/" data-id="cjrq2645i0004ncqxn9yr036s" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/docker/">docker</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-code review/如何生成完整的diff文件-md" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/04/code review/如何生成完整的diff文件-md/" class="article-date">
+  <time datetime="2019-02-04T06:38:08.000Z" itemprop="datePublished">2019-02-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/04/code review/如何生成完整的diff文件-md/">如何生成完整的diff文件.md</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>我们知道，一般执行<code>svn diff</code>命令，只会列出发生文件变更的行及前后几行，不会完整的显示出所有的代码。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">$ svn diff README.md</span><br><span class="line">Index: README.md</span><br><span class="line">===================================================================</span><br><span class="line">--- README.md   (revision 2608)</span><br><span class="line">+++ README.md   (working copy)</span><br><span class="line">@@ -1,6 +1,7 @@</span><br><span class="line"> # frontend</span><br><span class="line"></span><br><span class="line"> &gt; A Vue.js project</span><br><span class="line">+测试diff</span><br><span class="line"></span><br><span class="line"> ## Build Setup</span><br></pre></td></tr></table></figure></p>
+<p>因此通过<code>arc diff</code>命令，上传到phabricator网页的代码，也是非完整的。这在审查代码时有时（例如仅一行代码发生变更）无法获取上下文语境。<br>为了查看完整的diff文件，可以采用Gnu diff工具。</p>
+<h2 id="安装Gnu-diff"><a href="#安装Gnu-diff" class="headerlink" title="安装Gnu diff"></a>安装Gnu diff</h2><p>下载网页：<a href="http://gnuwin32.sourceforge.net/packages/diffutils.htm，">http://gnuwin32.sourceforge.net/packages/diffutils.htm，</a><br>点击下载Complete package，然后安装。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Description		Download		Size		Last change		Md5sum</span><br><span class="line">• Complete package, except sources	 	Setup	 	2145352	 	24 May 2004	 	d39323cc46969ccbbab26321e238953e</span><br></pre></td></tr></table></figure></p>
+<p>安装完成后，在磁盘上创建一个批处理文件——<code>mydiff.bat</code>，输入以下内容：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">@echo off</span><br><span class="line">F:\GnuWin32\bin\diff.exe  -U9999999 -L %3 -L %5 %6 %7</span><br></pre></td></tr></table></figure></p>
+<p>这里<code>F:\GnuWin32\bin\diff.exe</code>是该文件的路径，替换成你自己的。</p>
+<h2 id="修改svn配置"><a href="#修改svn配置" class="headerlink" title="修改svn配置"></a>修改svn配置</h2><p>这里以Tortotise SVN客户端为例，右键-&gt;settings-&gt;General, 点击Edit按钮，打开Subversion configuration file, 找到<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"># diff-cmd = diff_program (diff, gdiff, etc.)</span><br></pre></td></tr></table></figure></p>
+<p>这行，后面添加<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">diff-cmd = F:\GnuWin32\mydiff.bat</span><br></pre></td></tr></table></figure></p>
+<p>保存文件。<br>现在执行<code>svn diff</code>就可以得到获取完整的文件了，<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">$ svn diff README.md</span><br><span class="line">Index: README.md</span><br><span class="line">===================================================================</span><br><span class="line">--- README.md   (revision 2608)</span><br><span class="line">+++ README.md   (working copy)</span><br><span class="line">@@ -1,21 +1,22 @@</span><br><span class="line"> # frontend</span><br><span class="line"></span><br><span class="line"> &gt; A Vue.js project</span><br><span class="line">+测试diff</span><br><span class="line"></span><br><span class="line"> ## Build Setup</span><br><span class="line"></span><br><span class="line"> ``` bash</span><br><span class="line"> # install dependencies</span><br><span class="line"> npm install</span><br><span class="line"></span><br><span class="line"> # serve with hot reload at localhost:8080</span><br><span class="line"> npm run dev</span><br><span class="line"></span><br><span class="line"> # build for production with minification</span><br><span class="line"> npm run build</span><br><span class="line"></span><br><span class="line"> # build for production and view the bundle analyzer report</span><br><span class="line"> npm run build --report</span><br><span class="line"></span><br><span class="line"> For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/02/04/code review/如何生成完整的diff文件-md/" data-id="cjrq2645a0002ncqxu20qe6y2" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/code-review/">code-review</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-code review/phabricator平台简明使用教程-md" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/04/code review/phabricator平台简明使用教程-md/" class="article-date">
+  <time datetime="2019-02-04T05:42:31.000Z" itemprop="datePublished">2019-02-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/04/code review/phabricator平台简明使用教程-md/">phabricator平台简明使用教程.md</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>目前组里的codereview没有专门工具支持，评委仅仅通过svn客户端的show log命令，查看提交代码的diff内容，然后将评审意见以word的方式保存，再通过邮件或bqq的方式发送给被评审人。这种评审方式不够简洁和有效率，并存在以下不足：</p>
+<ol>
+<li>代码必须事先提交到svn。这种先提交再评审的方式，有问题的代码，也会先进入代码仓库，等到评审意见出来并修改后，才被修复。从代码质量管控上来看，这种先提交再评审流程并不好；</li>
+<li>以word方式保存评审意见，不够直观。评审人需要截图或至少告知是哪个文件的哪一行有问题，如果代码问题较多，评审人就会花上一些时间在截图、标明代码位置上。另外，word的排版没有统一模板，每个评审人的评审word内容风格不一，被评审人查看评审意见时，可能还需要花些时间读懂评审意见的轮廓；</li>
+<li>如果一份代码有多个评委，因为评审意见以word保存，他们相互之间不能方便的看到其他人的评审意见。可能会出现问题代码重复评审，浪费时间；</li>
+<li>评审意见容易丢失。以word方式保存，容易丢失，从长远来看，大量的代码评审数据缺失（评审次数、评审代码量、哪些评审意见具有高质量等）</li>
+</ol>
+<p><a href="http://note.youdao.com/noteshare?id=7672ee151c28eef700c7d8359360ff5d&sub=3A9FDD7B7B04429D9740375122FE2DD6" target="_blank">有道笔记</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/02/04/code review/phabricator平台简明使用教程-md/" data-id="cjrq264510001ncqxzu4gkxhy" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/code-review/">code-review</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
+    <article id="post-vue/vue框架下的国际化-md" class="article article-type-post" itemscope="" itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/02/04/vue/vue框架下的国际化-md/" class="article-date">
+  <time datetime="2019-02-04T05:21:09.000Z" itemprop="datePublished">2019-02-04</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/02/04/vue/vue框架下的国际化-md/">vue/vue框架下的国际化.md</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>公司项目有国际化的需求，并且网页端已经采用vue实现，因此需要设计支持多国语言的方案。其中，由于一些历史原因，我们的vue框架还包含了一些js、jq插件（例如富文本框ueditor，上传组件uploadifived等），这些插件也要实现国际化。</p>
+<p><a href="http://note.youdao.com/noteshare?id=93a785dac7d94ff72949c16109bca807&sub=FF72FBD486774A2B8FA687383BBC6B18" target="_blank">有道笔记</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/02/04/vue/vue框架下的国际化-md/" data-id="cjrq2645w0006ncqxk0ibtkvv" class="article-share-link">Share</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/">vue</a></li></ul>
+
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-vue/自动提交webapp-md" class="article article-type-post" itemscope="" itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/02/02/vue/自动提交webapp-md/" class="article-date">
@@ -90,50 +344,30 @@
 <h2 id="提交流程"><a href="#提交流程" class="headerlink" title="提交流程"></a>提交流程</h2><body><br><embed src="/images/自动提交webapp-流程.svg" width="400px"><br></body>
 
 <h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><p>. auto-commit.sh<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line">#!/bin/sh</span><br><span class="line">set -x</span><br><span class="line">###########################################</span><br><span class="line">###自动编译、并提交webapp目录的内容到svn###</span><br><span class="line"># 1. 将该脚本置于前端frontend目录下</span><br><span class="line"># 2. 执行  sh  auto-commit.sh  $&#123;comment&#125;</span><br><span class="line">#</span><br><span class="line"># 适用的项目结构</span><br><span class="line"># |rj(rj_u, etc.)     项目根目录</span><br><span class="line"># |-- webapp     前端生产代码</span><br><span class="line"># |-- frontend   前端开发代码</span><br><span class="line"># |  |-- auto-commit.sh</span><br><span class="line"># 适用的svn客户端Tortoise SVN 1.9+</span><br><span class="line">###########################################</span><br><span class="line"></span><br><span class="line">comment=$1</span><br><span class="line">#检验评论长度，必须大于4个字符</span><br><span class="line">if [ $&#123;#comment&#125; -le 4 ];then</span><br><span class="line">    echo &quot;评论长度必须大于4个字符&quot;</span><br><span class="line">    echo &quot;Usage: sh auto-commit.sh \$&#123;comment&#125;&quot;</span><br><span class="line">    exit</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">sourcePath=`pwd`</span><br><span class="line">#校验脚本存放路径，必须置于前端frontend目录中</span><br><span class="line">if [ &quot;$&#123;sourcePath##*/&#125;&quot; != &quot;frontend&quot; ];then</span><br><span class="line">    echo &quot;脚本未置于frontend中，自动编译和部署无法生效&quot;</span><br><span class="line">    exit</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#编译前强制同步svn最新代码</span><br><span class="line">cd ..</span><br><span class="line">if [ -d webapp ];then</span><br><span class="line">    [ -d webapp.bak ] &amp;&amp; rm -rf webapp.bak</span><br><span class="line">    echo &quot;备份当前webapp为webapp.bak&quot;</span><br><span class="line">    mv webapp webapp.bak</span><br><span class="line">fi</span><br><span class="line">svn update</span><br><span class="line">if [ $? -ne 0 ];then</span><br><span class="line">    echo &quot;执行svn update出错，请检查&quot;</span><br><span class="line">    exit</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#如果webapp未托管到svn，托管之</span><br><span class="line">if [ ! -d  webapp ];then</span><br><span class="line">    echo &quot;不存在webapp目录，创建之&quot;</span><br><span class="line">    mkdir webapp</span><br><span class="line">    echo &quot;添加webapp目录到svn&quot;</span><br><span class="line">    svn add webapp</span><br><span class="line">    svn ci webapp -m &quot;添加webapp目录到svn&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#为了添加新编译代码中出现的新文件，需要先删除svn上的生产版本</span><br><span class="line">cd webapp</span><br><span class="line">buildPath=`pwd`</span><br><span class="line">if [ `ls|wc -l` -gt 0 ];then</span><br><span class="line">    svn delete *</span><br><span class="line">    echo &quot;删除svn上的生产版本&quot;</span><br><span class="line">    svn ci * -m &quot;删除之前的生产版本&quot;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#编译代码</span><br><span class="line">echo &quot;执行代码编译&quot;</span><br><span class="line">cd $sourcePath</span><br><span class="line">npm run build</span><br><span class="line">if [ $? -ne 0 ];then</span><br><span class="line">    echo &quot;代码编译失败！请检查&quot;</span><br><span class="line">    exit</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line">#提交代码到svn</span><br><span class="line">cd $buildPath</span><br><span class="line">svn add *</span><br><span class="line">echo &quot;提交新代码&quot;</span><br><span class="line">svn ci * -m &quot;***自动提交***$&#123;comment&#125;&quot;</span><br></pre></td></tr></table></figure></p>
-<p>.流程图语法<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">graph TD;</span><br><span class="line">    A[开始] --&gt; B&#123;判断是否有webapp目录&#125;</span><br><span class="line">    B --&gt;|是| C[备份webapp目录并删除]</span><br><span class="line">    C --&gt; D</span><br><span class="line">    B --&gt;|否| D[从svn同步最新代码]</span><br><span class="line">    D --&gt; E&#123;判断是否有webapp目录&#125;</span><br><span class="line">    E --&gt;|否| F[&quot;创建webapp目录，并托管到svn&quot;]</span><br><span class="line">    E --&gt;|是| G&#123;判断webapp目录下是否有文件&#125;</span><br><span class="line">    F --&gt; G</span><br><span class="line">    G --&gt;|是| H[&quot;将webapp目录下的文件，从svn中删除&quot;]</span><br><span class="line">    G --&gt;|否| I[执行压缩编译]</span><br><span class="line">    H --&gt; I</span><br><span class="line">    I --&gt; J[将webapp下的文件提交到svn]</span><br><span class="line">    J --&gt; K[结束]</span><br></pre></td></tr></table></figure></p>
+<p>.流程图语法</p>
+<pre class="mermaid">graph TD;
+    A[开始] --> B{判断是否有webapp目录}
+    B -->|是| C[备份webapp目录并删除]
+    C --> D
+    B -->|否| D[从svn同步最新代码]
+    D --> E{判断是否有webapp目录}
+    E -->|否| F["创建webapp目录，并托管到svn"]
+    E -->|是| G{判断webapp目录下是否有文件}
+    F --> G
+    G -->|是| H["将webapp目录下的文件，从svn中删除"]
+    G -->|否| I[执行压缩编译]
+    H --> I
+    I --> J[将webapp下的文件提交到svn]
+    J --> K[结束]</pre>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/02/02/vue/自动提交webapp-md/" data-id="cjrnktbc90002qgqxkzyubcp2" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/02/02/vue/自动提交webapp-md/" data-id="cjrq2645p0005ncqxtkk1i5lk" class="article-share-link">Share</a>
       
       
-    </footer>
-  </div>
-  
-</article>
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/vue/">vue</a></li></ul>
 
-
-  
-    <article id="post-test" class="article article-type-post" itemscope="" itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/01/22/test/" class="article-date">
-  <time datetime="2019-01-22T12:50:36.000Z" itemprop="datePublished">2019-01-22</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="article-title" href="/2019/01/22/test/">test</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/22/test/" data-id="cjrnktbb50000qgqxj8k3dl14" class="article-share-link">Share</a>
-      
-      
     </footer>
   </div>
   
@@ -163,20 +397,20 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
+        <p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
 <h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
+<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
 <h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
+<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
 <h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
+<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
 <h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+<p>More info: <a href="https://hexo.io/docs/deployment.html">Deployment</a></p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/01/19/hello-world/" data-id="cjrnktbbd0001qgqx2ht0etex" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/01/19/hello-world/" data-id="cjrq263yz0000ncqxex9wuvcr" class="article-share-link">Share</a>
       
       
     </footer>
@@ -196,9 +430,23 @@
 
   
     
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tags</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/code-review/">code-review</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/docker/">docker</a></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/vue/">vue</a></li></ul>
+    </div>
+  </div>
+
 
   
     
+  <div class="widget-wrap">
+    <h3 class="widget-title">Tag Cloud</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/code-review/" style="font-size: 20px;">code-review</a> <a href="/tags/docker/" style="font-size: 10px;">docker</a> <a href="/tags/vue/" style="font-size: 20px;">vue</a>
+    </div>
+  </div>
+
   
     
   <div class="widget-wrap">
@@ -217,15 +465,23 @@
       <ul>
         
           <li>
+            <a href="/2019/02/04/docker/Poseidon主页部署/">Poseidon主页部署.md</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/04/code review/如何生成完整的diff文件-md/">如何生成完整的diff文件.md</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/04/code review/phabricator平台简明使用教程-md/">phabricator平台简明使用教程.md</a>
+          </li>
+        
+          <li>
+            <a href="/2019/02/04/vue/vue框架下的国际化-md/">vue/vue框架下的国际化.md</a>
+          </li>
+        
+          <li>
             <a href="/2019/02/02/vue/自动提交webapp-md/">自动提交webapp.md</a>
-          </li>
-        
-          <li>
-            <a href="/2019/01/22/test/">test</a>
-          </li>
-        
-          <li>
-            <a href="/2019/01/19/hello-world/">Hello World</a>
           </li>
         
       </ul>
@@ -244,6 +500,14 @@
       Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>
     </div>
   </div>
+  {% if theme.mermaid.enable %}
+  <script src="https://unpkg.com/mermaid@{{ theme.mermaid.version }}/dist/mermaid.min.js"></script>
+  <script>
+    if (window.mermaid) {
+      mermaid.initialize({theme: 'forest'});
+    }
+  </script>
+  {% endif %}
 </footer>
     </div>
     <nav id="mobile-nav">
